@@ -1,0 +1,375 @@
+ <!DOCTYPE html>
+
+<html lang="en">
+
+    <head>
+
+        <meta charset="UTF-8">
+
+        <meta name="viewport", content="width=device-width, initial-scale=1">
+
+        <title>Automatic Pipe Inspector Bot</title>
+
+        <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
+
+
+        <style> 
+
+body {
+
+  font-family: 'Orbitron', monospace; /*Standard font for entire app*/
+
+  margin: 0;
+
+  min-height: 100vh;
+
+  color: white;
+
+  font-weight: 900;
+
+  background: linear-gradient(135deg, #5593f7, #220775ff); /*Colour-Gradient Background*/
+
+}
+
+.top-bar {
+
+  height: 60px;
+
+  background: #dadfe0;
+
+  color: #061518;
+
+  display: flex;
+
+  align-items: center; /*Center objects horizontally*/
+
+  justify-content: center;/*Center objects vertically*/
+
+  font-size: 38px;
+
+}
+
+
+
+.button-container{
+
+  justify-content: center;
+
+  gap: 20px;
+
+  display: flex;
+
+  position: relative;
+
+  top: 150px; /*Used to position higher or lower (with lower or higher values)*/
+
+  flex-wrap: wrap;
+
+}
+
+button {
+
+  padding: 15px 25px;
+
+  margin: 10px;
+
+  color: white;
+
+  font-family: 'Orbitron', monospace;
+
+  height: 100px;
+
+  width: 150px;
+
+  background-color: #1e3c6c;
+
+  border-radius: 27px;
+
+  border-style: inset;
+
+  font-size: 30px;
+
+  cursor: pointer;
+
+}
+
+button:hover {
+
+  transition-duration: 0.15s;
+
+  opacity: 0.8;
+
+  box-shadow: 0 5px 15px 2px rgba(0, 0, 0, 0.3);
+
+}
+
+
+
+.guide-container {
+
+  justify-content: center;
+
+  display: flex;
+
+  position: relative;
+
+  flex-wrap: wrap;
+
+  top: 100px;
+
+}
+
+.guide {
+
+  transform: translateY(100px);
+
+  font-family: 'Orbitron', monospace;
+
+  color: whitesmoke;
+
+  font-size: 28px;
+
+  text-align: center; /*Align text in center of page*/
+
+  max-width: 800px;
+
+}
+
+
+
+.camera-container {
+
+  margin-top: 220px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center; /*Centre camera horizontally*/
+
+  gap: 15px;
+
+}
+
+.cam {
+
+  font-family: 'Orbitron', monospace;
+
+  font-size: 28px;
+
+}
+
+video {
+
+  border-style: solid;
+
+}
+
+.navbar {
+
+  display: flex;
+
+  gap: 40px;
+
+  font-size: 16px;
+
+}
+
+.navbar a {
+
+  color: #061518;
+
+  padding: 10px 18px;
+
+  border-radius: 8px;
+
+  transition: background 0.25s ease, color 0.25s ease;
+
+}
+
+.navbar a:hover {
+
+  background: rgba(6, 21, 24, 0.1);
+
+  color: #000;
+
+}
+
+        </style>
+
+        </head>
+
+        <body>
+
+          <div class="top-bar">Automatic Pipe Inspector Bot</div>
+
+
+
+<nav class="navbar">   <!--Linking to other.html files for nav bar-->
+
+    <a href="Codefest_Web-App.html">Home</a>
+
+    <a href="pipe-bot.html">Automatic Pipe-Inspector Bot</a>
+
+    <a href="manhole-bot.html">Manhole Cleaning Bot</a>
+
+  </nav>
+
+  
+
+          <div class="button-container">
+
+            <button onclick="sendCommand('forward')">Up</button>
+
+            <button onclick="sendCommand('backward')">Down</button>
+
+            <button onclick="sendCommand('right')">Right</button>
+
+            <button onclick="sendCommand('left')">Left</button>
+
+            <button onclick="sendCommand('stop')">Stop</button>
+
+          </div>
+
+          <div class="guide-container">
+
+          <div class="guide">Connect to the robot's (ESP32's) IP adress to control the bot:</div>
+
+          </div>
+
+          <div class="camera-container">
+
+  <div class="cam">📷 Live Camera Feed:</div>
+
+  <video id="cam" width="480" height="360" autoplay></video>
+
+</div>
+
+  <script>
+
+    const ESP32_IP = "http://192.168.4.1"; //ESP32 IP adress (constant value)
+
+    let activeKey = null; //Storing variable "which key is being held down"
+
+
+
+    function sendCommand(command) {
+
+      fetch(`${ESP32_IP}/${command}`) //Use fetch API to send HTTP request, make URL
+
+    .then(response => console.log("Command sent:", command)) //Success message
+
+    .catch(error => console.error("Error sending command:", error));//Error message
+
+    } //Messages are printed in VS code terminal (console.log)
+
+
+
+    document.addEventListener("keydown", function(event) { //Detect key press
+
+      const key = event.key.toLowerCase();
+
+
+
+      if (activeKey !== key) { //Only send command if not sent before
+
+        activeKey = key; //"event.key", which key being pressed
+
+        switch (key) {
+
+          case "w":
+
+            sendCommand("forward");
+
+            break;
+
+          case "s":
+
+            sendCommand("backward");
+
+            break;
+
+          case "a":
+
+            sendCommand("left");
+
+            break;
+
+          case "d":
+
+            sendCommand("right");
+
+            break;
+
+          case " ":
+
+            sendCommand("stop");
+
+            break;
+
+          case "enter":
+
+            sendCommand("spray");
+
+            break;
+
+        }
+
+      }
+
+    });
+
+//Check if key is released to stop robot:
+
+    document.addEventListener("keyup", function(event) {
+
+      const key = event.key.toLowerCase(); //convert all keyboard inputs to small
+
+      if (
+
+        key === "w" ||
+
+        key === "s" ||
+
+        key === "a" ||
+
+        key === "d" ||
+
+        key === "enter" ||
+
+        key === " " 
+
+      ) {
+
+        sendCommand("stop");
+
+        activeKey = null; //=activeKey = nothing (for now)
+
+      }
+
+    });
+
+
+
+    // Web-cam access
+
+    navigator.mediaDevices.getUserMedia({ video: true }) //stream video (boolean)
+
+      .then(stream => {
+
+        document.getElementById("cam").srcObject = stream;
+
+      })
+
+      .catch(err => {
+
+        alert("Camera access denied or not supported."); //Error message
+
+        console.error(err); //Print in terminal
+
+      });
+
+  </script>
+
+
+</html>
